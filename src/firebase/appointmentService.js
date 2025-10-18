@@ -200,20 +200,40 @@ export const cancelAppointment = async (appointmentId) => {
  */
 export const getAppointmentsByDate = async (date) => {
   try {
-    const q = query(
-      collection(db, APPOINTMENTS_COLLECTION),
-      where('date', '==', date),
-      orderBy('time', 'asc')
-    );
-    
-    const querySnapshot = await getDocs(q);
+    // 獲取所有預約，然後在前端篩選（因為需要支援兩種日期格式）
+    const querySnapshot = await getDocs(collection(db, APPOINTMENTS_COLLECTION));
     const appointments = [];
     
     querySnapshot.forEach((doc) => {
-      appointments.push({
-        id: doc.id,
-        ...doc.data()
-      });
+      const data = doc.data();
+      let matchesDate = false;
+      
+      // 檢查舊格式（字串）
+      if (data.date === date) {
+        matchesDate = true;
+      }
+      
+      // 檢查新格式（Timestamp）
+      if (data.bookingDate && data.bookingDate.toDate) {
+        const bookingDateStr = data.bookingDate.toDate().toISOString().split('T')[0];
+        if (bookingDateStr === date) {
+          matchesDate = true;
+        }
+      }
+      
+      if (matchesDate) {
+        appointments.push({
+          id: doc.id,
+          ...data
+        });
+      }
+    });
+    
+    // 按時間排序
+    appointments.sort((a, b) => {
+      const timeA = a.bookingTime || a.time || '';
+      const timeB = b.bookingTime || b.time || '';
+      return timeA.localeCompare(timeB);
     });
     
     return appointments;
@@ -247,7 +267,7 @@ export const checkTimeSlotAvailability = async (date, time, duration) => {
     for (const appointment of appointments) {
       if (appointment.status === 'cancelled') continue;
       
-      const existingStart = timeToMinutes(appointment.time);
+      const existingStart = timeToMinutes(appointment.bookingTime || appointment.time);
       const existingEnd = existingStart + appointment.duration;
       
       // 檢查時間是否重疊

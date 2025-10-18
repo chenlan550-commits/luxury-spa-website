@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { createAppointment, checkTimeSlotAvailability } from '../firebase/appointmentService';
 import { getAllServices } from '../firebase/servicesService';
+import { Timestamp } from 'firebase/firestore';
 
 const BookingForm = () => {
   const [formData, setFormData] = useState({
@@ -120,19 +121,27 @@ const BookingForm = () => {
       // 計算價格
       const price = formData.useOwnOils ? selectedService.discountPrice : selectedService.price;
 
-      // 創建預約
+      // 將日期字串轉換為 Timestamp
+      const dateTimestamp = Timestamp.fromDate(new Date(formData.date + 'T00:00:00'));
+
+      // 創建預約 - 同時儲存 Timestamp 和字串格式以保持向後兼容
       const appointmentData = {
         customerName: formData.customerName,
         phone: formData.phone,
         email: formData.email,
         serviceId: selectedService.id,
         serviceName: selectedService.name,
+        // 新格式：使用 Timestamp（與後台一致）
+        bookingDate: dateTimestamp,
+        bookingTime: formData.time,
+        // 舊格式：保留字串格式以向後兼容
         date: formData.date,
         time: formData.time,
         duration: selectedService.duration,
         price: price,
         useOwnOils: formData.useOwnOils,
-        notes: formData.notes
+        notes: formData.notes,
+        source: 'website' // 標記來源為前端網站
       };
 
       const id = await createAppointment(appointmentData);

@@ -1,0 +1,33 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git push:*)",
+      "Bash(git log:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(pnpm dev)",
+      "WebFetch(domain:manus.im)",
+      "Read(//c/Users/polung/Desktop/spa-admin-firebase/**)",
+      "Bash(cat /c/Users/polung/Desktop/spa-admin-firebase/package.json)",
+      "Bash(cat /c/Users/polung/Desktop/spa-admin-firebase/src/services/bookingService.js)",
+      "Bash(cat /c/Users/polung/Desktop/spa-admin-firebase/src/services/serviceService.js)",
+      "Bash(pnpm dev --port 5176)",
+      "mcp__ide__getDiagnostics",
+      "Bash(rm -rf src/admin)",
+      "Bash(pnpm install)",
+      "Bash(netstat -ano)",
+      "Bash(findstr \":5173\")",
+      "Bash(findstr \":5174\")",
+      "Bash(taskkill /PID 6040 /F)",
+      "Bash(taskkill /PID 5860 /F)",
+      "Bash(taskkill /PID 19792 /F)",
+      "Bash(taskkill //PID 6040 //F)",
+      "Bash(taskkill //PID 5860 //F)",
+      "Bash(taskkill //PID 19792 //F)",
+      "Bash(cat .env.local)",
+      "Bash(node test-firebase.js)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

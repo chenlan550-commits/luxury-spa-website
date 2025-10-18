@@ -42,15 +42,15 @@ const BookingForm = () => {
   const generateTimeSlots = () => {
     const slots = [];
     const startHour = 10;
-    const endHour = 21;
-    
+    const endHour = 19; // 修改為19:00，最後一個時段是18:30
+
     for (let hour = startHour; hour < endHour; hour++) {
       for (let minute = 0; minute < 60; minute += 30) {
         const timeStr = `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
         slots.push(timeStr);
       }
     }
-    
+
     return slots;
   };
 

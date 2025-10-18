@@ -1,22 +1,6 @@
 import { useState, useEffect } from 'react';
 import { createAppointment, checkTimeSlotAvailability } from '../firebase/appointmentService';
-
-// 療程服務資料 (從 Services.jsx 獲取)
-const services = [
-  { id: 'B01', name: '顱沐淋巴舒壓', duration: 90, price: 2200, discountPrice: 1600 },
-  { id: 'B02', name: '腿部輕迎煥新護理', duration: 90, price: 2200, discountPrice: 1600 },
-  { id: 'B03', name: '輕奢課程', duration: 90, price: 2250, discountPrice: 1700 },
-  { id: 'B04', name: '盈纖緊緻雕塑', duration: 90, price: 2400, discountPrice: 1800 },
-  { id: 'B05', name: '極緻舒活全身釋壓', duration: 120, price: 2800, discountPrice: 2000 },
-  { id: 'B06', name: '芳香溫灸', duration: 90, price: 2200, discountPrice: 1600 },
-  { id: 'B07', name: '淋巴芳香調理', duration: 90, price: 2200, discountPrice: 1600 },
-  { id: 'B08', name: '舞風暖宮疏胸', duration: 120, price: 3200, discountPrice: 2400 },
-  { id: 'B09', name: '美胸窈窕纖盈', duration: 130, price: 3400, discountPrice: 2400 },
-  { id: 'F01', name: '晶亮雪肌嫩白', duration: 90, price: 4200, discountPrice: 1600 },
-  { id: 'F02', name: '清新亮妍臉部保養', duration: 90, price: 2400, discountPrice: 1600 },
-  { id: 'F03', name: '晶緻亮眼肌活', duration: 130, price: 3200, discountPrice: 2400 },
-  { id: 'P01', name: '孕婦SPA', duration: 90, price: 2400, discountPrice: 1800 }
-];
+import { getAllServices } from '../firebase/servicesService';
 
 const BookingForm = () => {
   const [formData, setFormData] = useState({
@@ -30,12 +14,28 @@ const BookingForm = () => {
     notes: ''
   });
 
+  const [services, setServices] = useState([]);
   const [selectedService, setSelectedService] = useState(null);
   const [availableTimeSlots, setAvailableTimeSlots] = useState([]);
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState('');
   const [appointmentId, setAppointmentId] = useState('');
+
+  // 從 Firebase 載入療程資料
+  useEffect(() => {
+    const fetchServices = async () => {
+      try {
+        const servicesData = await getAllServices();
+        setServices(servicesData);
+      } catch (err) {
+        console.error('無法載入療程資料:', err);
+        setError('無法載入療程資料，請稍後再試');
+      }
+    };
+
+    fetchServices();
+  }, []);
 
   // 生成可用時段
   const generateTimeSlots = () => {

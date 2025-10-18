@@ -1,7 +1,8 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { Clock, Star, ArrowRight, Sparkles } from 'lucide-react'
 import { Button } from '@/components/ui/button.jsx'
+import { getAllServices } from '@/firebase/servicesService'
 
 const translations = {
   zh: {
@@ -590,9 +591,51 @@ const translations = {
 
 export default function Services({ language }) {
   const [activeCategory, setActiveCategory] = useState('bodyspa')
+  const [services, setServices] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
   const t = translations[language]
 
   const categories = Object.keys(t.categories)
+
+  // 從 Firebase 讀取療程資料
+  useEffect(() => {
+    const fetchServices = async () => {
+      try {
+        setLoading(true)
+        const servicesData = await getAllServices()
+        setServices(servicesData)
+        setError(null)
+      } catch (err) {
+        console.error('無法載入療程資料:', err)
+        setError('無法載入療程資料，請稍後再試')
+        // 發生錯誤時使用靜態資料作為備援
+        setServices([])
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchServices()
+  }, [])
+
+  // 根據分類和語言過濾療程
+  const getServicesByCategory = (category) => {
+    return services.filter(service => service.category === category)
+  }
+
+  // 根據語言獲取療程的名稱和描述
+  const getLocalizedService = (service) => {
+    const langSuffix = language === 'en' ? 'En' : language === 'ja' ? 'Ja' : ''
+    return {
+      ...service,
+      name: service[`name${langSuffix}`] || service.name,
+      description: service[`description${langSuffix}`] || service.description,
+      process: service[`process${langSuffix}`] || service.process,
+      subtitle: service[`subtitle${langSuffix}`] || service.subtitle,
+      options: service.options ? JSON.parse(service.options) : null
+    }
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-amber-50 via-white to-stone-100 pt-20">
@@ -633,8 +676,26 @@ export default function Services({ language }) {
       {/* Services Grid */}
       <section className="py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {t.services[activeCategory]?.map((service, index) => (
+          {/* Loading State */}
+          {loading && (
+            <div className="flex justify-center items-center py-20">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-amber-600"></div>
+            </div>
+          )}
+
+          {/* Error State */}
+          {error && (
+            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-4">
+              {error}
+            </div>
+          )}
+
+          {/* Services Grid */}
+          {!loading && !error && (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {getServicesByCategory(activeCategory)?.map((serviceData, index) => {
+                const service = getLocalizedService(serviceData)
+                return (
               <div key={service.id} className="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300 transform hover:scale-105 group">
                 {/* Service Image */}
                 <div className="h-48 bg-gradient-to-br from-amber-100 to-amber-200 relative overflow-hidden">
@@ -845,8 +906,9 @@ export default function Services({ language }) {
                   </Link>
                 </div>
               </div>
-            ))}
+            )})}
           </div>
+          )}
         </div>
       </section>
 

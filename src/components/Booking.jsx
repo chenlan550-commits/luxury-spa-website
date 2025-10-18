@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useLocation } from 'react-router-dom'
 import { Calendar, Clock, User, Phone, Mail, CreditCard, Check, ArrowLeft, ArrowRight } from 'lucide-react'
 import { Button } from '@/components/ui/button.jsx'
+import { createAppointment } from '../firebase/appointmentService'
 
 const translations = {
   zh: {
@@ -10,32 +11,40 @@ const translations = {
     steps: ['選擇服務', '選擇時間', '填寫資料', '確認預約'],
     services: {
       bodyspa: [
-        { id: 'B01', name: 'Sparkle Spa', price: 3100, duration: 90 },
-        { id: 'B02', name: '能量之鑰', price: 3150, duration: 90 },
-        { id: 'B03', name: '微光淨化', price: 2750, duration: 75 },
-        { id: 'B04', name: '活力奔放', price: 3150, duration: 90 },
-        { id: 'B05', name: '甦活之旅', price: 2250, duration: 60 },
-        { id: 'B06', name: '輕漾水感', price: 2900, duration: 75 },
-        { id: 'B07', name: '逆時活泉', price: 3300, duration: 100 },
-        { id: 'B08', name: '窈窕纖體', price: 3400, duration: 100 }
+        { id: 'B01', name: '顱沐淋巴舒壓', price: 2180, selfOilPrice: 1480, duration: 60 },
+        { id: 'B02', name: '腿部輕迎煥新護理', price: 1880, selfOilPrice: 1280, duration: 60 },
+        { id: 'B03', name: '輕奢課程', price: 2300, selfOilPrice: 1500, duration: 70 },
+        { id: 'B04', name: '盈纖緊緻雕塑', price: 2200, selfOilPrice: 1600, duration: 90 },
+        { id: 'B05-90', name: '極緻舒活全身釋壓 (90分鐘)', price: 2200, selfOilPrice: 1600, duration: 90 },
+        { id: 'B05-120', name: '極緻舒活全身釋壓 (120分鐘)', price: 2880, selfOilPrice: 2080, duration: 120 },
+        { id: 'B06', name: '芳香溫灸', price: 2600, selfOilPrice: 1800, duration: 90 },
+        { id: 'B07', name: '淋巴芳香調理', price: 2200, selfOilPrice: 1600, duration: 90 },
+        { id: 'B08', name: '舞風暖宮疏胸', price: 3200, selfOilPrice: 2400, duration: 120 },
+        { id: 'B09', name: '美胸窈窕纖盈', price: 3400, selfOilPrice: 2400, duration: 130 }
       ],
       facialspa: [
-        { id: 'F01', name: '璀璨光采', price: 2800, duration: 75 },
-        { id: 'F02', name: '青春密碼', price: 3200, duration: 90 },
-        { id: 'F03', name: '淨透無瑕', price: 2400, duration: 60 },
-        { id: 'F04', name: '水潤奇蹟', price: 2600, duration: 75 }
+        { id: 'F01', name: '晶亮雪肌嫩白', price: 4200, selfOilPrice: 1600, duration: 90 },
+        { id: 'F02', name: '清新亮妍臉部保養', price: 2400, selfOilPrice: 1600, duration: 90 },
+        { id: 'F03', name: '晶緻亮眼肌活', price: 3200, selfOilPrice: 2400, duration: 130 }
       ],
       minispa: [
-        { id: 'M01', name: '肩頸舒緩', price: 1200, duration: 30 },
-        { id: 'M02', name: '足部護理', price: 1400, duration: 45 },
-        { id: 'M03', name: '頭部紓壓', price: 1000, duration: 30 },
-        { id: 'M04', name: '手部護理', price: 800, duration: 30 }
+        { id: 'M01', name: '能量甦醒', price: 500, duration: 20 },
+        { id: 'M02', name: '頭部理療', price: 500, duration: 20 },
+        { id: 'M03', name: '纖體釋放（腰、手、背）', price: 690, duration: 20 },
+        { id: 'M04', name: '溫感淨化泥浴', price: 1099, duration: 30 },
+        { id: 'M05', name: '暖宮疏胸', price: 800, duration: 40 },
+        { id: 'M06-30', name: '加價課程 (30分鐘)', price: 600, duration: 30 },
+        { id: 'M06-60', name: '加價課程 (60分鐘)', price: 1000, duration: 60 }
+      ],
+      pregnancyspa: [
+        { id: 'P01', name: '孕婦SPA', price: 2400, duration: 90 }
       ]
     },
     categories: {
       bodyspa: '身體療程',
       facialspa: '臉部護理',
-      minispa: '迷你療程'
+      minispa: '加購課程',
+      pregnancyspa: '孕婦專護'
     },
     form: {
       name: '姓名',
@@ -103,32 +112,40 @@ const translations = {
     steps: ['Select Service', 'Choose Time', 'Fill Information', 'Confirm Booking'],
     services: {
       bodyspa: [
-        { id: 'B01', name: 'Sparkle Spa', price: 3100, duration: 90 },
-        { id: 'B02', name: 'Energy Key', price: 3150, duration: 90 },
-        { id: 'B03', name: 'Shimmer Purification', price: 2750, duration: 75 },
-        { id: 'B04', name: 'Vitality Burst', price: 3150, duration: 90 },
-        { id: 'B05', name: 'Revival Journey', price: 2250, duration: 60 },
-        { id: 'B06', name: 'Gentle Hydration', price: 2900, duration: 75 },
-        { id: 'B07', name: 'Timeless Spring', price: 3300, duration: 100 },
-        { id: 'B08', name: 'Graceful Sculpting', price: 3400, duration: 100 }
+        { id: 'B01', name: 'Cranial Lymphatic Relief', price: 2180, selfOilPrice: 1480, duration: 60 },
+        { id: 'B02', name: 'Leg Renewal Care', price: 1880, selfOilPrice: 1280, duration: 60 },
+        { id: 'B03', name: 'Luxury Introductory Course', price: 2300, selfOilPrice: 1500, duration: 70 },
+        { id: 'B04', name: 'Slimming Firming Sculpting', price: 2200, selfOilPrice: 1600, duration: 90 },
+        { id: 'B05-90', name: 'Ultimate Relaxation Full Body Release (90min)', price: 2200, selfOilPrice: 1600, duration: 90 },
+        { id: 'B05-120', name: 'Ultimate Relaxation Full Body Release (120min)', price: 2880, selfOilPrice: 2080, duration: 120 },
+        { id: 'B06', name: 'Aromatic Moxibustion', price: 2600, selfOilPrice: 1800, duration: 90 },
+        { id: 'B07', name: 'Lymphatic Aromatic Therapy', price: 2200, selfOilPrice: 1600, duration: 90 },
+        { id: 'B08', name: 'Feminine Warming & Chest Care', price: 3200, selfOilPrice: 2400, duration: 120 },
+        { id: 'B09', name: 'Breast Enhancement & Body Sculpting', price: 3400, selfOilPrice: 2400, duration: 130 }
       ],
       facialspa: [
-        { id: 'F01', name: 'Radiant Glow', price: 2800, duration: 75 },
-        { id: 'F02', name: 'Youth Code', price: 3200, duration: 90 },
-        { id: 'F03', name: 'Pure Clarity', price: 2400, duration: 60 },
-        { id: 'F04', name: 'Hydration Miracle', price: 2600, duration: 75 }
+        { id: 'F01', name: 'Crystal Bright Snow Skin Whitening', price: 4200, selfOilPrice: 1600, duration: 90 },
+        { id: 'F02', name: 'Fresh Radiant Facial Care', price: 2400, selfOilPrice: 1600, duration: 90 },
+        { id: 'F03', name: 'Crystal Bright Eye Revitalization', price: 3200, selfOilPrice: 2400, duration: 130 }
       ],
       minispa: [
-        { id: 'M01', name: 'Shoulder & Neck Relief', price: 1200, duration: 30 },
-        { id: 'M02', name: 'Foot Care', price: 1400, duration: 45 },
-        { id: 'M03', name: 'Head Stress Relief', price: 1000, duration: 30 },
-        { id: 'M04', name: 'Hand Care', price: 800, duration: 30 }
+        { id: 'M01', name: 'Energy Revival', price: 500, duration: 20 },
+        { id: 'M02', name: 'Head Therapy', price: 500, duration: 20 },
+        { id: 'M03', name: 'Body Release (Waist, Arms, Back)', price: 690, duration: 20 },
+        { id: 'M04', name: 'Warm Purifying Mud Bath', price: 1099, duration: 30 },
+        { id: 'M05', name: 'Uterine Warming & Chest Care', price: 800, duration: 40 },
+        { id: 'M06-30', name: 'Extension Service (30min)', price: 600, duration: 30 },
+        { id: 'M06-60', name: 'Extension Service (60min)', price: 1000, duration: 60 }
+      ],
+      pregnancyspa: [
+        { id: 'P01', name: 'Pregnancy SPA', price: 2400, duration: 90 }
       ]
     },
     categories: {
       bodyspa: 'Body Treatments',
       facialspa: 'Facial Care',
-      minispa: 'Mini Treatments'
+      minispa: 'Add-on Services',
+      pregnancyspa: 'Pregnancy Care'
     },
     form: {
       name: 'Name',
@@ -196,32 +213,40 @@ const translations = {
     steps: ['サービス選択', '時間選択', '情報入力', '予約確認'],
     services: {
       bodyspa: [
-        { id: 'B01', name: 'Sparkle Spa', price: 3100, duration: 90 },
-        { id: 'B02', name: 'エネルギーキー', price: 3150, duration: 90 },
-        { id: 'B03', name: 'シマー浄化', price: 2750, duration: 75 },
-        { id: 'B04', name: 'バイタリティバースト', price: 3150, duration: 90 },
-        { id: 'B05', name: 'リバイバルジャーニー', price: 2250, duration: 60 },
-        { id: 'B06', name: 'ジェントルハイドレーション', price: 2900, duration: 75 },
-        { id: 'B07', name: 'タイムレススプリング', price: 3300, duration: 100 },
-        { id: 'B08', name: 'グレースフルスカルプティング', price: 3400, duration: 100 }
+        { id: 'B01', name: '頭蓋リンパ緩和', price: 2180, selfOilPrice: 1480, duration: 60 },
+        { id: 'B02', name: '脚部軽やか再生ケア', price: 1880, selfOilPrice: 1280, duration: 60 },
+        { id: 'B03', name: 'ラグジュアリー入門コース', price: 2300, selfOilPrice: 1500, duration: 70 },
+        { id: 'B04', name: 'スリム引き締め彫刻', price: 2200, selfOilPrice: 1600, duration: 90 },
+        { id: 'B05-90', name: '極上リラックス全身解放 (90分)', price: 2200, selfOilPrice: 1600, duration: 90 },
+        { id: 'B05-120', name: '極上リラックス全身解放 (120分)', price: 2880, selfOilPrice: 2080, duration: 120 },
+        { id: 'B06', name: '芳香温灸', price: 2600, selfOilPrice: 1800, duration: 90 },
+        { id: 'B07', name: 'リンパ芳香調理', price: 2200, selfOilPrice: 1600, duration: 90 },
+        { id: 'B08', name: '舞風温宮疏胸', price: 3200, selfOilPrice: 2400, duration: 120 },
+        { id: 'B09', name: '美胸しなやかスリム', price: 3400, selfOilPrice: 2400, duration: 130 }
       ],
       facialspa: [
-        { id: 'F01', name: 'ラディアントグロー', price: 2800, duration: 75 },
-        { id: 'F02', name: 'ユースコード', price: 3200, duration: 90 },
-        { id: 'F03', name: 'ピュアクラリティ', price: 2400, duration: 60 },
-        { id: 'F04', name: 'ハイドレーションミラクル', price: 2600, duration: 75 }
+        { id: 'F01', name: '晶亮雪肌美白', price: 4200, selfOilPrice: 1600, duration: 90 },
+        { id: 'F02', name: '清新輝顔フェイシャルケア', price: 2400, selfOilPrice: 1600, duration: 90 },
+        { id: 'F03', name: '晶緻明眸肌活', price: 3200, selfOilPrice: 2400, duration: 130 }
       ],
       minispa: [
-        { id: 'M01', name: '肩首リリーフ', price: 1200, duration: 30 },
-        { id: 'M02', name: 'フットケア', price: 1400, duration: 45 },
-        { id: 'M03', name: 'ヘッドストレスリリーフ', price: 1000, duration: 30 },
-        { id: 'M04', name: 'ハンドケア', price: 800, duration: 30 }
+        { id: 'M01', name: 'エネルギー蘇生', price: 500, duration: 20 },
+        { id: 'M02', name: 'ヘッドセラピー', price: 500, duration: 20 },
+        { id: 'M03', name: 'ボディリリース（腰・腕・背中）', price: 690, duration: 20 },
+        { id: 'M04', name: '温感浄化泥浴', price: 1099, duration: 30 },
+        { id: 'M05', name: '温宮疏胸', price: 800, duration: 40 },
+        { id: 'M06-30', name: '追加料金コース (30分)', price: 600, duration: 30 },
+        { id: 'M06-60', name: '追加料金コース (60分)', price: 1000, duration: 60 }
+      ],
+      pregnancyspa: [
+        { id: 'P01', name: '妊婦SPA', price: 2400, duration: 90 }
       ]
     },
     categories: {
       bodyspa: 'ボディトリートメント',
       facialspa: 'フェイシャルケア',
-      minispa: 'ミニトリートメント'
+      minispa: '追加コース',
+      pregnancyspa: 'マタニティケア'
     },
     form: {
       name: 'お名前',
@@ -347,15 +372,50 @@ export default function Booking({ language }) {
 
   const handleFinalConfirm = async () => {
     setIsSubmitting(true)
-    
-    // 模擬預約提交
+
     try {
-      await new Promise(resolve => setTimeout(resolve, 2000))
-      const reference = 'SPA' + Date.now().toString().slice(-6)
+      // 準備預約資料，與後台管理系統的欄位對應
+      const appointmentData = {
+        // 客戶資訊
+        customerName: customerInfo.name,
+        customerPhone: customerInfo.phone,
+        customerEmail: customerInfo.email,
+        customerGender: customerInfo.gender,
+        customerAge: customerInfo.age,
+
+        // 療程資訊
+        serviceId: selectedService.id,
+        serviceName: selectedService.name,
+        servicePrice: selectedService.price,
+        serviceDuration: selectedService.duration,
+        serviceCategory: selectedCategory,
+
+        // 預約時間
+        appointmentDate: selectedDate,
+        bookingDate: selectedDate, // 兼容後台
+        appointmentTime: selectedTime,
+        bookingTime: selectedTime, // 兼容後台
+        date: selectedDate, // 兼容舊版
+        time: selectedTime, // 兼容舊版
+        duration: selectedService.duration,
+
+        // 備註
+        notes: customerInfo.notes || '',
+
+        // 狀態 - 預設為待確認
+        status: 'pending'
+      }
+
+      // 存入 Firebase
+      const appointmentId = await createAppointment(appointmentData)
+
+      // 生成預約編號
+      const reference = 'SPA' + appointmentId.slice(-6).toUpperCase()
       setBookingReference(reference)
       setBookingComplete(true)
     } catch (error) {
-      alert('預約失敗，請稍後再試')
+      console.error('預約失敗:', error)
+      alert('預約失敗，請稍後再試。錯誤訊息：' + error.message)
     } finally {
       setIsSubmitting(false)
     }
@@ -488,9 +548,18 @@ export default function Booking({ language }) {
                 {t.services[selectedCategory].map((service) => (
                   <div key={service.id} className="bg-white rounded-2xl shadow-lg p-6 hover:shadow-2xl transition-all duration-300">
                     <h3 className="text-xl font-bold text-gray-900 mb-2">{service.name}</h3>
-                    <div className="flex items-center justify-between mb-4">
-                      <span className="text-2xl font-bold text-amber-600">NT${service.price.toLocaleString()}</span>
-                      <span className="text-gray-500">{service.duration}分鐘</span>
+                    <div className="mb-4">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <span className="text-2xl font-bold text-amber-600">NT${service.price.toLocaleString()}</span>
+                          {service.selfOilPrice && (
+                            <div className="text-sm text-green-600 font-medium mt-1">
+                              自備精油 NT${service.selfOilPrice.toLocaleString()}
+                            </div>
+                          )}
+                        </div>
+                        <span className="text-gray-500">{service.duration}分鐘</span>
+                      </div>
                     </div>
                     <Button
                       onClick={() => handleServiceSelect(service)}

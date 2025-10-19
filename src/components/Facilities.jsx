@@ -1,5 +1,6 @@
 import { useState } from 'react'
-import { Car, Coffee, Users, Sparkles, MapPin, Clock, Wifi, AirVent } from 'lucide-react'
+import { Link } from 'react-router-dom'
+import { Car, Coffee, Users, Sparkles, MapPin, Clock, Wifi, AirVent, ArrowRight } from 'lucide-react'
 import { Button } from '@/components/ui/button.jsx'
 
 const translations = {
@@ -65,7 +66,7 @@ const translations = {
     cta: {
       title: '準備好體驗我們的奢華空間了嗎？',
       description: '立即預約，親自感受我們精心打造的每一個細節',
-      button: '立即預約參觀'
+      button: '立即預約'
     }
   },
   en: {
@@ -130,7 +131,7 @@ const translations = {
     cta: {
       title: 'Ready to experience our luxury space?',
       description: 'Book now and personally feel every detail we have carefully crafted',
-      button: 'Book a Visit Now'
+      button: 'Book Now'
     }
   },
   ja: {
@@ -195,7 +196,7 @@ const translations = {
     cta: {
       title: '私たちの豪華空間を体験する準備はできましたか？',
       description: '今すぐ予約して、私たちが丁寧に作り上げたすべての詳細を直接感じてください',
-      button: '今すぐ見学予約'
+      button: '今すぐ予約'
     }
   }
 }
@@ -339,9 +340,12 @@ export default function Facilities({ language }) {
           <p className="text-xl text-gray-300 mb-8">
             {t.cta.description}
           </p>
-          <Button className="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white px-8 py-4 rounded-full text-lg font-medium shadow-2xl hover:shadow-3xl transition-all duration-300 transform hover:scale-105">
-            {t.cta.button}
-          </Button>
+          <Link to="/booking">
+            <Button className="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white px-8 py-4 rounded-full text-lg font-medium shadow-2xl hover:shadow-3xl transition-all duration-300 transform hover:scale-105">
+              {t.cta.button}
+              <ArrowRight className="ml-2 w-5 h-5 inline" />
+            </Button>
+          </Link>
         </div>
       </section>
     </div>

@@ -1,5 +1,7 @@
 import React from 'react'
-import { Heart, Award, Sparkles, Target, Leaf, Users, Shield, Star } from 'lucide-react'
+import { Link } from 'react-router-dom'
+import { Heart, Award, Sparkles, Target, Leaf, Users, Shield, Star, ArrowRight } from 'lucide-react'
+import { Button } from '@/components/ui/button.jsx'
 
 const translations = {
   zh: {
@@ -252,9 +254,12 @@ const About = ({ language = 'zh' }) => {
           <p className="text-xl mb-8 text-amber-100">
             讓我們用專業的精油調理技術，為您打造專屬的健康美麗方案
           </p>
-          <button className="bg-white text-amber-600 px-8 py-4 rounded-full font-semibold text-lg hover:bg-amber-50 transition-colors duration-300 shadow-lg hover:shadow-xl transform hover:scale-105">
-            立即預約體驗
-          </button>
+          <Link to="/booking">
+            <Button className="bg-white text-amber-600 px-8 py-4 rounded-full font-semibold text-lg hover:bg-amber-50 transition-colors duration-300 shadow-lg hover:shadow-xl transform hover:scale-105">
+              立即預約體驗
+              <ArrowRight className="ml-2 w-5 h-5 inline" />
+            </Button>
+          </Link>
         </div>
       </section>
     </div>

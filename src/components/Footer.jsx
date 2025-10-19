@@ -1,4 +1,6 @@
+import { useState } from 'react'
 import { MapPin, Phone, Clock, Mail, Facebook, Instagram, Youtube, Twitter } from 'lucide-react'
+import { subscribeNewsletter } from '../firebase/newsletterService'
 
 const translations = {
   zh: {
@@ -42,7 +44,11 @@ const translations = {
       title: '訂閱電子報',
       description: '訂閱我們的電子報，第一時間獲得最新優惠與活動資訊',
       placeholder: '請輸入您的電子郵件',
-      button: '訂閱'
+      button: '訂閱',
+      success: '感謝您的訂閱！我們會將最新資訊發送到您的信箱。',
+      error: '訂閱失敗，請稍後再試。',
+      alreadySubscribed: '此 Email 已經訂閱過電子報',
+      invalidEmail: '請輸入有效的 Email 地址'
     },
     copyright: '© 2024 奢華精油SPA. 版權所有.',
     policies: [
@@ -92,7 +98,11 @@ const translations = {
       title: 'Newsletter',
       description: 'Subscribe to our newsletter to get the latest offers and event information',
       placeholder: 'Enter your email address',
-      button: 'Subscribe'
+      button: 'Subscribe',
+      success: 'Thank you for subscribing! We will send the latest information to your inbox.',
+      error: 'Subscription failed, please try again later.',
+      alreadySubscribed: 'This email has already subscribed to the newsletter',
+      invalidEmail: 'Please enter a valid email address'
     },
     copyright: '© 2024 Luxury Essential Oil SPA. All rights reserved.',
     policies: [
@@ -142,7 +152,11 @@ const translations = {
       title: 'ニュースレター',
       description: '最新のオファーやイベント情報を入手するには、ニュースレターを購読してください',
       placeholder: 'メールアドレスを入力してください',
-      button: '購読'
+      button: '購読',
+      success: 'ご購読ありがとうございます！最新情報をメールでお送りします。',
+      error: '購読に失敗しました。後でもう一度お試しください。',
+      alreadySubscribed: 'このメールアドレスはすでにニュースレターを購読しています',
+      invalidEmail: '有効なメールアドレスを入力してください'
     },
     copyright: '© 2024 ラグジュアリーエッセンシャルオイルSPA. 全著作権所有.',
     policies: [
@@ -155,11 +169,52 @@ const translations = {
 
 export default function Footer({ language }) {
   const t = translations[language]
+  const [email, setEmail] = useState('')
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [message, setMessage] = useState({ type: '', text: '' })
 
-  const handleNewsletterSubmit = (e) => {
+  const handleNewsletterSubmit = async (e) => {
     e.preventDefault()
-    // 處理電子報訂閱邏輯
-    alert('感謝您的訂閱！')
+
+    // 清除之前的訊息
+    setMessage({ type: '', text: '' })
+
+    // 驗證 Email 格式
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    if (!emailRegex.test(email)) {
+      setMessage({ type: 'error', text: t.newsletter.invalidEmail })
+      return
+    }
+
+    setIsSubmitting(true)
+
+    try {
+      // 呼叫 Firebase 服務儲存訂閱者
+      await subscribeNewsletter({
+        email: email,
+        language: language
+      })
+
+      // 訂閱成功
+      setMessage({ type: 'success', text: t.newsletter.success })
+      setEmail('') // 清空輸入框
+    } catch (error) {
+      console.error('Newsletter subscription error:', error)
+
+      // 判斷錯誤類型
+      if (error.message.includes('已經訂閱')) {
+        setMessage({ type: 'error', text: t.newsletter.alreadySubscribed })
+      } else {
+        setMessage({ type: 'error', text: t.newsletter.error })
+      }
+    } finally {
+      setIsSubmitting(false)
+
+      // 3秒後自動清除訊息
+      setTimeout(() => {
+        setMessage({ type: '', text: '' })
+      }, 5000)
+    }
   }
 
   return (
@@ -258,16 +313,37 @@ export default function Footer({ language }) {
               <form onSubmit={handleNewsletterSubmit} className="space-y-3">
                 <input
                   type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
                   placeholder={t.newsletter.placeholder}
                   required
-                  className="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent text-white placeholder-gray-400"
+                  disabled={isSubmitting}
+                  className="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent text-white placeholder-gray-400 disabled:opacity-50 disabled:cursor-not-allowed"
                 />
                 <button
                   type="submit"
-                  className="w-full bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white py-2 rounded-lg font-medium transition-all duration-200"
+                  disabled={isSubmitting}
+                  className="w-full bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white py-2 rounded-lg font-medium transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  {t.newsletter.button}
+                  {isSubmitting ? (
+                    <div className="flex items-center justify-center">
+                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
+                      {language === 'zh' ? '訂閱中...' : language === 'ja' ? '購読中...' : 'Subscribing...'}
+                    </div>
+                  ) : (
+                    t.newsletter.button
+                  )}
                 </button>
+                {/* 訊息提示 */}
+                {message.text && (
+                  <div className={`text-sm p-2 rounded-lg ${
+                    message.type === 'success'
+                      ? 'bg-green-900/50 text-green-300 border border-green-700'
+                      : 'bg-red-900/50 text-red-300 border border-red-700'
+                  }`}>
+                    {message.text}
+                  </div>
+                )}
               </form>
             </div>
           </div>

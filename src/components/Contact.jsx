@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { MapPin, Phone, Clock, Mail, Send, MessageCircle } from 'lucide-react'
 import { Button } from '@/components/ui/button.jsx'
+import { createContactMessage } from '../firebase/contactService'
 
 const translations = {
   zh: {
@@ -54,8 +55,9 @@ const translations = {
         '企業包場',
         '其他諮詢'
       ],
-      success: '訊息已送出！我們會盡快與您聯絡。',
-      error: '送出失敗，請稍後再試或直接來電聯絡。'
+      success: '訊息已送出！我們會在24小時內與您聯絡。',
+      error: '送出失敗，請稍後再試或直接來電聯絡。',
+      sending: '送出中...'
     },
     directions: {
       title: '交通指引',
@@ -131,8 +133,9 @@ const translations = {
         'Corporate Events',
         'Other Consultation'
       ],
-      success: 'Message sent! We will contact you as soon as possible.',
-      error: 'Failed to send. Please try again later or contact us directly by phone.'
+      success: 'Message sent! We will contact you within 24 hours.',
+      error: 'Failed to send. Please try again later or contact us directly by phone.',
+      sending: 'Sending...'
     },
     directions: {
       title: 'Transportation Guide',
@@ -208,8 +211,9 @@ const translations = {
         '企業イベント',
         'その他のご相談'
       ],
-      success: 'メッセージが送信されました！できるだけ早くご連絡いたします。',
-      error: '送信に失敗しました。後でもう一度お試しいただくか、直接お電話でお問い合わせください。'
+      success: 'メッセージが送信されました！24時間以内にご連絡いたします。',
+      error: '送信に失敗しました。後でもう一度お試しいただくか、直接お電話でお問い合わせください。',
+      sending: '送信中...'
     },
     directions: {
       title: 'アクセス',
@@ -260,11 +264,23 @@ export default function Contact({ language }) {
   const handleSubmit = async (e) => {
     e.preventDefault()
     setIsSubmitting(true)
-    
-    // 模擬表單提交
+    setSubmitStatus('')
+
     try {
-      await new Promise(resolve => setTimeout(resolve, 1000))
+      // 儲存到 Firebase Firestore
+      await createContactMessage({
+        name: formData.name,
+        phone: formData.phone,
+        email: formData.email,
+        service: formData.service,
+        message: formData.message,
+        language: language
+      })
+
+      // 送出成功
       setSubmitStatus('success')
+
+      // 清空表單
       setFormData({
         name: '',
         phone: '',
@@ -273,9 +289,12 @@ export default function Contact({ language }) {
         message: ''
       })
     } catch (error) {
+      console.error('Contact form submission error:', error)
       setSubmitStatus('error')
     } finally {
       setIsSubmitting(false)
+
+      // 5秒後清除訊息
       setTimeout(() => setSubmitStatus(''), 5000)
     }
   }
@@ -442,12 +461,12 @@ export default function Contact({ language }) {
                 <Button
                   type="submit"
                   disabled={isSubmitting}
-                  className="w-full bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white py-3 rounded-lg font-medium shadow-md hover:shadow-lg transition-all duration-200 disabled:opacity-50"
+                  className="w-full bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white py-3 rounded-lg font-medium shadow-md hover:shadow-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {isSubmitting ? (
                     <div className="flex items-center justify-center">
                       <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
-                      送出中...
+                      {t.form.sending}
                     </div>
                   ) : (
                     <div className="flex items-center justify-center">

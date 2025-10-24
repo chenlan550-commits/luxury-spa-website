@@ -241,7 +241,6 @@ const translations = {
 }
 
 export default function Contact({ language }) {
-  const baseUrl = import.meta.env.BASE_URL
   const [formData, setFormData] = useState({
     name: '',
     phone: '',
@@ -486,7 +485,7 @@ export default function Contact({ language }) {
                 <h3 className="text-2xl font-bold text-gray-900 mb-6">位置地圖</h3>
                 <div className="w-full rounded-lg overflow-hidden shadow-md mb-4">
                   <img 
-                    src={`${baseUrl}google-maps-location.jpg`} 
+                    src={`${import.meta.env.BASE_URL}google-maps-location.jpg`} 
                     alt="香熏緻身心調理館位置地圖 - 406台中市北屯區崇德十路一段550號"
                     className="w-full h-64 object-cover"
                   />

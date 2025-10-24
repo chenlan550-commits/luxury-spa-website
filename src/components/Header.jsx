@@ -34,7 +34,6 @@ const translations = {
 }
 
 export default function Header({ language, setLanguage }) {
-  const baseUrl = import.meta.env.BASE_URL
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [isLangOpen, setIsLangOpen] = useState(false)
   const location = useLocation()
@@ -61,7 +60,7 @@ export default function Header({ language, setLanguage }) {
           {/* Logo */}
           <Link to="/" className="flex items-center space-x-3">
             <div className="w-12 h-12 flex items-center justify-center">
-              <img src={`${baseUrl}ytcep-logo.png`} alt="Ytcep Logo" className="w-12 h-12 object-contain" />
+              <img src={`${import.meta.env.BASE_URL}ytcep-logo.png`} alt="Ytcep Logo" className="w-12 h-12 object-contain" />
             </div>
             <div>
               <h1 className="text-2xl font-bold bg-gradient-to-r from-amber-600 to-amber-800 bg-clip-text text-transparent">

@@ -595,7 +595,6 @@ export default function Services({ language }) {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const t = translations[language]
-  const baseUrl = import.meta.env.BASE_URL
 
   const categories = Object.keys(t.categories)
 
@@ -703,70 +702,70 @@ export default function Services({ language }) {
                   {/* 根據服務ID顯示對應圖片 */}
                   {service.id === 'B01' && (
                     <img 
-                      src={`${baseUrl}cranial-lymphatic.png`} 
+                      src={`${import.meta.env.BASE_URL}cranial-lymphatic.png`} 
                       alt={service.name}
                       className="w-full h-full object-cover"
                     />
                   )}
                   {service.id === 'B02' && (
                     <img 
-                      src={`${baseUrl}leg-care.png`} 
+                      src={`${import.meta.env.BASE_URL}leg-care.png`} 
                       alt={service.name}
                       className="w-full h-full object-cover"
                     />
                   )}
                   {service.id === 'B03' && (
                     <img 
-                      src={`${baseUrl}luxury-intro.png`} 
+                      src={`${import.meta.env.BASE_URL}luxury-intro.png`} 
                       alt={service.name}
                       className="w-full h-full object-cover"
                     />
                   )}
                   {service.id === 'B04' && (
                     <img 
-                      src={`${baseUrl}body-sculpting.jpg`} 
+                      src={`${import.meta.env.BASE_URL}body-sculpting.jpg`} 
                       alt={service.name}
                       className="w-full h-full object-cover"
                     />
                   )}
                   {service.id === 'B05' && (
                     <img 
-                      src={`${baseUrl}full-body-relaxation.png`} 
+                      src={`${import.meta.env.BASE_URL}full-body-relaxation.png`} 
                       alt={service.name}
                       className="w-full h-full object-cover"
                     />
                   )}
                   {service.id === 'B06' && (
                     <img 
-                      src={`${baseUrl}aromatic-moxibustion.jpg`} 
+                      src={`${import.meta.env.BASE_URL}aromatic-moxibustion.jpg`} 
                       alt={service.name}
                       className="w-full h-full object-cover"
                     />
                   )}
                   {service.id === 'B07' && (
                     <img 
-                      src={`${baseUrl}lymphatic-drainage.jpg`} 
+                      src={`${import.meta.env.BASE_URL}lymphatic-drainage.jpg`} 
                       alt={service.name}
                       className="w-full h-full object-cover"
                     />
                   )}
                   {service.id === 'B08' && (
                     <img 
-                      src={`${baseUrl}womb-care.jpg`} 
+                      src={`${import.meta.env.BASE_URL}womb-care.jpg`} 
                       alt={service.name}
                       className="w-full h-full object-cover"
                     />
                   )}
                   {service.id === 'B09' && (
                     <img 
-                      src={`${baseUrl}breast-body-sculpting.jpg`} 
+                      src={`${import.meta.env.BASE_URL}breast-body-sculpting.jpg`} 
                       alt={service.name}
                       className="w-full h-full object-cover"
                     />
                   )}
                   {service.id === 'F01' && (
                     <img 
-                      src={`${baseUrl}facial-whitening.jpg`} 
+                      src={`${import.meta.env.BASE_URL}facial-whitening.jpg`} 
                       alt={service.name}
                       className="w-full h-full object-cover"
                     />
@@ -774,21 +773,21 @@ export default function Services({ language }) {
 
                   {service.id === 'F02' && (
                     <img 
-                      src={`${baseUrl}facial-care.jpg`} 
+                      src={`${import.meta.env.BASE_URL}facial-care.jpg`} 
                       alt={service.name}
                       className="w-full h-full object-cover"
                     />
                   )}
                   {service.id === 'F03' && (
                     <img 
-                      src={`${baseUrl}eye-care.png`} 
+                      src={`${import.meta.env.BASE_URL}eye-care.png`} 
                       alt={service.name}
                       className="w-full h-full object-cover"
                     />
                   )}
                   {service.id === 'P01' && (
                     <img 
-                      src={`${baseUrl}pregnancy-spa.png`} 
+                      src={`${import.meta.env.BASE_URL}pregnancy-spa.png`} 
                       alt={service.name}
                       className="w-full h-full object-cover"
                     />

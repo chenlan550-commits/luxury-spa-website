@@ -142,18 +142,20 @@ export default function Home({ language }) {
   const [currentSlide, setCurrentSlide] = useState(0)
   const t = translations[language]
 
+  const baseUrl = import.meta.env.BASE_URL
+
   const heroImages = [
     {
-      desktop: '/hero-1.png',
-      mobile: '/hero-1-mobile.png'
+      desktop: `${baseUrl}hero-1.png`,
+      mobile: `${baseUrl}hero-1-mobile.png`
     },
     {
-      desktop: '/hero-2.png',
-      mobile: '/hero-2-mobile.png'
+      desktop: `${baseUrl}hero-2.png`,
+      mobile: `${baseUrl}hero-2-mobile.png`
     },
     {
-      desktop: '/hero-3.png',
-      mobile: '/hero-3-mobile.png'
+      desktop: `${baseUrl}hero-3.png`,
+      mobile: `${baseUrl}hero-3-mobile.png`
     }
   ]
 
@@ -270,9 +272,9 @@ export default function Home({ language }) {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
             {t.services.categories.map((category, index) => {
               const images = [
-                '/home-body-treatment.png',
-                '/home-facial-care.jpg',
-                '/home-mini-treatment.png'
+                `${baseUrl}home-body-treatment.png`,
+                `${baseUrl}home-facial-care.jpg`,
+                `${baseUrl}home-mini-treatment.png`
               ]
               return (
                 <div key={index} className="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300 transform hover:scale-105">

@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useLocation } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import { Calendar, Clock, User, Phone, Mail, CreditCard, Check, ArrowLeft, ArrowRight } from 'lucide-react'
 import { Button } from '@/components/ui/button.jsx'
 import { createAppointment } from '../firebase/appointmentService'
@@ -312,6 +312,7 @@ const translations = {
 
 export default function Booking({ language }) {
   const location = useLocation()
+  const navigate = useNavigate()
   const [currentStep, setCurrentStep] = useState(1)
   const [selectedService, setSelectedService] = useState(location.state?.selectedService || null)
   const [selectedCategory, setSelectedCategory] = useState('bodyspa')
@@ -461,8 +462,8 @@ export default function Booking({ language }) {
               </ul>
             </div>
 
-            <Button 
-              onClick={() => window.location.href = '/'}
+            <Button
+              onClick={() => navigate('/')}
               className="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white px-8 py-3 rounded-full"
             >
               返回首頁

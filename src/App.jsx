@@ -15,7 +15,7 @@ function App() {
   const [language, setLanguage] = useState('zh')
 
   return (
-    <Router>
+    <Router basename={import.meta.env.BASE_URL}>
       <div className="min-h-screen bg-gradient-to-br from-amber-50 via-white to-stone-100">
         <Header language={language} setLanguage={setLanguage} />
         <main>
